@@ -39,7 +39,8 @@ public:
 	{
 		PluginBase::initialize(uas_);
 		last_pos_time = ros::Time(0.0);
-		gps_period = ros::Duration(0.1);	// 10hz
+		gps_period = ros::Duration(0.2);	// 5hz
+		ros_t = ros::Time::now();
 		mocap_tf_d_sub = mp_nh.subscribe("fix", 1, &MocapFakeGPSPlugin::mocap_tf_d_cb, this);
 	}
 
@@ -53,6 +54,8 @@ private:
 
 	ros::Subscriber mocap_tf_d_sub;
 	ros::Subscriber mocap_tf_params_sub;
+
+	ros::Time ros_t;
 
 	double old_stamp;
 	double old_north;
@@ -133,7 +136,8 @@ private:
 
 		// Fill in and send message
 		mavlink::common::msg::HIL_GPS pos;
-		pos.time_usec = trans->header.stamp.toNSec() / 1000;
+		ros_t = ros::Time::now();
+		pos.time_usec = ros_t.toNSec() / 1000;
 		pos.lat = (lat_rad * 180 / M_PI) * 10000000;	// [degrees * 1E7]
 		pos.lon = (lon_rad * 180 / M_PI) * 10000000;	// [degrees * 1E7]
 		pos.alt = (408 - down) * 1000;			// [m * 1000] AMSL
