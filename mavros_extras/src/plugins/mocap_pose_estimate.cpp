@@ -43,6 +43,8 @@ public:
 		bool use_tf;
 		bool use_pose;
 
+		ros_t = ros::Time::now();
+
 		/** @note For VICON ROS package, subscribe to TransformStamped topic */
 		mp_nh.param("use_tf", use_tf, false);
 
@@ -70,6 +72,8 @@ private:
 
 	ros::Subscriber mocap_pose_sub;
 	ros::Subscriber mocap_tf_sub;
+
+	ros::Time ros_t;
 
 	/* -*- low-level send -*- */
 	void mocap_pose_send
@@ -102,8 +106,8 @@ private:
 					pose->pose.position.x,
 					pose->pose.position.y,
 					pose->pose.position.z));
-
-		mocap_pose_send(pose->header.stamp.toNSec() / 1000,
+		ros_t = ros::Time::now();
+		mocap_pose_send(ros_t.toNSec() / 1000,
 				q,
 				position);
 	}
